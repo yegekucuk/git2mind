@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "git2mind"
+version = "0.1.0"
+description = "Turn repositories into AI-friendly summaries (.md / .json)"
+readme = "README.md"
+license = "MIT"
+authors = [
+    {name = "yegekucuk", email = "yegekucuk@gmail.com"}
+]
+requires-python = ">=3.8"
+keywords = ["git", "repository", "summarization", "ai", "llm", "markdown", "json"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Software Development :: Version Control :: Git",
+]
+
+dependencies = []
+
+[project.optional-dependencies]
+full = [
+    "typer>=0.9.0",
+    "rich>=13.0",
+    "gitpython>=3.1.0",
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+git2mind = "git2mind:main"
+
+[project.urls]
+Homepage = "https://github.com/yegekucuk/git2mind"
+Documentation = "https://github.com/yegekucuk/git2mind#readme"
+Repository = "https://github.com/yegekucuk/git2mind"
+Issues = "https://github.com/yegekucuk/git2mind/issues"
+
+[tool.setuptools]
+py-modules = ["git2mind"]
+packages = ["src"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py38"
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]
+
+[tool.black]
+line-length = 120
+target-version = ["py38", "py39", "py310", "py311"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+addopts = "-v --cov=git2mind --cov-report=term-missing"

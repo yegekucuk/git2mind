@@ -1,0 +1,82 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.coverage.*
+*.cover
+.hypothesis/
+
+# Output files from git2mind
+git2mvp_output.md
+git2mvp_output.json
+git2mind_output.md
+git2mind_output.json
+*_summary.md
+*_summary.json
+summary.md
+summary.json
+output.md
+output.json
+
+# Logs
+*.log
+
+# Local configuration
+.env
+config.yaml
+config.json
+.git2mind/
+
+# Cache
+.cache/
+*.cache
+
+# Documentation builds
+docs/_build/
+site/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Roadmaps & Some Private Docs
+roadmap.txt
+other/

@@ -1,0 +1,129 @@
+import hashlib
+import re
+from pathlib import Path
+from datetime import datetime
+from src.data_models import Document
+
+class BaseParser:
+    """Base parser interface"""
+    def parse(self, path: Path, content: str) -> Document:
+        doc_id = hashlib.sha1(f"{path}{content}".encode()).hexdigest()[:16]
+        lines = content.count('\n') + 1 if content else 0
+        
+        return Document(
+            id=doc_id,
+            path=str(path),
+            language=self.get_language(path),
+            size_bytes=len(content.encode()),
+            lines=lines,
+            content=content,
+            meta={
+                "last_modified": datetime.fromtimestamp(path.stat().st_mtime).isoformat() if path.exists() else None
+            }
+        )
+    
+    def get_language(self, path: Path) -> str:
+        return "text"
+
+class PythonParser(BaseParser):
+    def get_language(self, path: Path) -> str:
+        return "python"
+    
+    def parse(self, path: Path, content: str) -> Document:
+        doc = super().parse(path, content)
+        # Extract functions and classes for metadata
+        functions = re.findall(r'def\s+(\w+)\s*\(', content)
+        classes = re.findall(r'class\s+(\w+)\s*[\(:]', content)
+        # Remove duplicates
+        functions = list(set(functions))
+        classes = list(set(classes))
+        doc.meta.update({
+            "functions": functions,
+            "classes": classes
+        })
+        return doc
+
+class MarkdownParser(BaseParser):
+    def get_language(self, path: Path) -> str:
+        return "markdown"
+    
+    def parse(self, path: Path, content: str) -> Document:
+        doc = super().parse(path, content)
+        # Extract headers
+        headers = re.findall(r'^#{1,6}\s+(.+)$', content, re.MULTILINE)
+        doc.meta["headers"] = headers
+        doc.meta["content"] = content
+        return doc
+    
+class DockerfileParser(BaseParser):
+    def get_language(self, path: Path) -> str:
+        return "dockerfile"
+    
+    def parse(self, path: Path, content: str) -> Document:
+        doc = super().parse(path, content)
+        image = None
+        workdir = None
+        entrypoint = None
+        cmd = None
+        env = {}
+        # Go throught the content and extract information
+        for line in content.splitlines():
+            line = line.strip()
+            upper_line = line.upper()
+            if upper_line.startswith('FROM ') and not image:
+                image = line[5:].split(' AS ')[0].strip()
+            elif upper_line.startswith('WORKDIR '):
+                workdir = line[8:].strip()
+            elif upper_line.startswith('ENTRYPOINT '):
+                entrypoint = line[11:].strip()
+            elif upper_line.startswith('CMD '):
+                cmd = line[4:].strip()
+            elif upper_line.startswith('ENV '):
+                # Parse ENV key=value or ENV key value
+                env_part = line[4:].strip()
+                if '=' in env_part:
+                    key, value = env_part.split('=', 1)
+                    env[key.strip()] = value.strip()
+                else:
+                    parts = env_part.split(None, 1)
+                    if len(parts) == 2:
+                        env[parts[0]] = parts[1]
+        doc.meta["image"] = image
+        doc.meta["workdir"] = workdir
+        doc.meta["entrypoint"] = entrypoint
+        doc.meta["cmd"] = cmd
+        doc.meta["env"] = env
+        return doc
+
+class LicenseParser(BaseParser):
+    def get_language(self, path: Path) -> str:
+        return "license"
+    
+    def parse(self, path, content):
+        doc = super().parse(path, content)
+        # Extract the first line (header) of the license
+        doc.meta["header"] = content.splitlines()[0].strip()
+        return doc
+
+class TextParser(BaseParser):
+    def get_language(self, path: Path) -> str:
+        return "text"
+    
+class UnknownParser(BaseParser):
+    def get_language(self, path: Path) -> str:
+        return "unknown"
+
+def get_parser(path: Path) -> BaseParser:
+    """Returns appropriate parser based on file extension"""
+    if path.name == "Dockerfile":
+        return DockerfileParser()
+    elif path.name == "LICENSE":
+        return LicenseParser()
+
+    ext = path.suffix.lower()
+    parsers = {
+        '.py': PythonParser(),
+        '.md': MarkdownParser(),
+        '.txt': TextParser(),
+    }
+    return parsers.get(ext, UnknownParser())
