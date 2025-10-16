@@ -16,12 +16,12 @@ git2mind scans a git repository, extracts and chunks files intelligently, and pr
 ## 📦 Installation
 
 ```bash
-# Install from source
+# Install from PyPI
+pip install git2mind
+
+# or install from source
 git clone https://github.com/yegekucuk/git2mind.git
 pip install -e git2mind
-
-# Install from PyPI (when published)
-pip install git2mind
 ```
 
 ## 🎯 Usage
@@ -138,9 +138,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - ✅ Python, Markdown, Dockerfile and License parsers
 - ✅ Simple line-based chunking
 - ✅ Markdown and JSON output formats
+- ✅ [PyPI package](https://pypi.org/project/git2mind/)
 
 ### Future:
-- [ ] PyPI package
 - [ ] Configuration file support
 - [ ] ML/NLP supported solutions for summarizing
 
