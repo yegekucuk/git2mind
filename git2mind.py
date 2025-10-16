@@ -19,14 +19,14 @@ def main():
     logger = logging.getLogger(__name__)
 
     parser = argparse.ArgumentParser(
-        description="git2mind - Turn Python repositories into AI-friendly format.",
+        description="g2m (git2mind) - Turn Python repositories into AI-friendly format.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  git2mind .
-  git2mind ./my-repo --format md --output repo_summary.md
-  git2mind . --exclude 'tests' --format json
-  git2mind /path/to/repo --verbose --chunk-size 100
+  g2m .
+  g2m ./my-repo -f md -o repo_summary.md
+  g2m . --exclude 'tests' --format json
+  g2m /path/to/repo --verbose --chunk-size 100
         """
     )
     
@@ -59,9 +59,10 @@ Examples:
         return 1
     
     # Set default output path
+    project_name = repo_path.absolute().name
     if not args.output:
         ext = 'json' if args.format == 'json' else 'md'
-        args.output = f"./git2mind_output.{ext}"
+        args.output = f"./{project_name}_summary.{ext}"
     
     logger.info(f"Processing repository: {repo_path}")
     logger.info(f"Output format: {args.format}")

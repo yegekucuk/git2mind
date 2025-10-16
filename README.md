@@ -2,7 +2,7 @@
 
 **Turn Python repositories into AI-friendly format (.md / .json)**
 
-git2mind scans a git repository, extracts and chunks files intelligently, and produces concise Markdown or JSON summaries that are ready for LLM consumption — perfect for code review automation, onboarding, and documentation generation.
+git2mind scans a git repository, extracts and chunks files intelligently, and produces concise Markdown or JSON summaries that are ready for LLM consumption — perfect for onboarding and documentation generation.
 
 ## 🚀 Features
 
@@ -18,8 +18,7 @@ git2mind scans a git repository, extracts and chunks files intelligently, and pr
 ```bash
 # Install from source
 git clone https://github.com/yegekucuk/git2mind.git
-cd git2mind
-pip install -e .
+pip install -e git2mind
 
 # Install from PyPI (when published)
 pip install git2mind
@@ -31,25 +30,25 @@ pip install git2mind
 
 ```bash
 # Generate summary of current directory (markdown by default)
-git2mind .
+g2m .
 
 # Generate JSON summary of current directory
-git2mind . --format json
+g2m . -f json
 
 # Specify the name of output file
-git2mind /path/to/repo --output summary.md
+g2m /path/to/repo -o summary.md
 
 # Exclude specific patterns
-git2mind ./my-repo --exclude "tests" --exclude "*.log" --format json --output summary.json
+g2m ./my-repo --exclude "tests" --exclude "*.log" --format md --output summary.md
 
 # Verbose output with custom chunk size
-git2mind . --verbose --chunk-size 100 --format md
+g2m . --verbose --chunk-size 100 --format json
 ```
 
 ### Command Line Options
 
 ```
-Usage: git2mind PATH [OPTIONS]
+Usage: g2m PATH [OPTIONS]
 
 Options:
   -f, --format [md|json]    Output format (default: md)
@@ -136,15 +135,13 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ### Current: MVP (v0.1.0)
 - ✅ Basic CLI with essential flags
 - ✅ Local repository reading
-- ✅ Python, Markdown, and text parsers
+- ✅ Python, Markdown, Dockerfile and License parsers
 - ✅ Simple line-based chunking
 - ✅ Markdown and JSON output formats
 
 ### Future:
 - [ ] PyPI package
 - [ ] Configuration file support
-- [ ] XML output format
-- [ ] Caching system
 - [ ] ML/NLP supported solutions for summarizing
 
 ## 📋 Default Exclusions
@@ -159,7 +156,6 @@ The following patterns are excluded by default:
 
 ## 🤝 Use Cases
 
-- **Code Review Automation** - Generate summaries for PR reviews
 - **Documentation Generation** - Create automatic project overviews
 - **Onboarding** - Help new team members understand codebases
 - **AI Context Preparation** - Prepare repositories for LLM analysis
@@ -167,10 +163,10 @@ The following patterns are excluded by default:
 
 ## 🙏 Acknowledgments
 
-- Inspired by the need to make codebases more accessible to AI models
+- Inspired by the need to make repositories more accessible to AI models
 - Built with Python standard library for maximum compatibility
 
 ## 📝 License
 
-- Author: Yunus Ege Küçük.
+- Author: Yunus Ege Küçük
 - MIT License - see [LICENSE](LICENSE) file for details

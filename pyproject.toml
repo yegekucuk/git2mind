@@ -37,7 +37,7 @@ full = [
 ]
 
 [project.scripts]
-git2mind = "git2mind:main"
+g2m = "git2mind:main"
 
 [project.urls]
 Homepage = "https://github.com/yegekucuk/git2mind"
