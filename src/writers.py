@@ -3,6 +3,8 @@ import json
 from logging import Logger
 from pathlib import Path
 from typing import List
+import xml.etree.ElementTree as ET
+from xml.dom import minidom
 
 from src.data_models import Document
 
@@ -105,3 +107,77 @@ class JsonWriter:
             json.dump(output, f, indent=2, ensure_ascii=False)
         
         self.logger.info(f"Wrote JSON output to {output_path}")
+
+class XMLWriter:
+    """Writes output in XML format"""
+    def __init__(self, logger: Logger):
+        self.logger = logger
+    
+    def write(self, repo_path: str, documents: List[Document], output_path: str):
+        """Generate XML output"""
+        root = ET.Element("repository")
+        
+        # Add repo info
+        repo_info = ET.SubElement(root, "info")
+        ET.SubElement(repo_info, "name").text = Path(repo_path).absolute().name
+        ET.SubElement(repo_info, "path").text = str(Path(repo_path).absolute())
+        ET.SubElement(repo_info, "generated_at").text = datetime.now().isoformat()
+        ET.SubElement(repo_info, "files_processed").text = str(len(documents))
+        
+        # Add files
+        files_elem = ET.SubElement(root, "files")
+        
+        for doc in documents:
+            file_elem = ET.SubElement(files_elem, "file")
+            ET.SubElement(file_elem, "path").text = doc.path
+            ET.SubElement(file_elem, "language").text = doc.language
+            ET.SubElement(file_elem, "size_bytes").text = str(doc.size_bytes)
+            ET.SubElement(file_elem, "lines").text = str(doc.lines)
+            
+            # Add metadata
+            metadata = ET.SubElement(file_elem, "metadata")
+            
+            if doc.language == "python":
+                if doc.meta.get("functions"):
+                    funcs = ET.SubElement(metadata, "functions")
+                    for func in doc.meta["functions"]:
+                        ET.SubElement(funcs, "function").text = func
+                if doc.meta.get("classes"):
+                    classes = ET.SubElement(metadata, "classes")
+                    for cls in doc.meta["classes"]:
+                        ET.SubElement(classes, "class").text = cls
+            elif doc.language == "markdown":
+                if doc.meta.get("headers"):
+                    headers = ET.SubElement(metadata, "headers")
+                    for header in doc.meta["headers"]:
+                        ET.SubElement(headers, "header").text = header
+            elif doc.language == "license":
+                if doc.meta.get("header"):
+                    ET.SubElement(metadata, "header").text = doc.meta["header"]
+            elif doc.language == "dockerfile":
+                if doc.meta.get("image"):
+                    ET.SubElement(metadata, "image").text = doc.meta["image"]
+                if doc.meta.get("workdir"):
+                    ET.SubElement(metadata, "workdir").text = doc.meta["workdir"]
+                if doc.meta.get("entrypoint"):
+                    ET.SubElement(metadata, "entrypoint").text = doc.meta["entrypoint"]
+                if doc.meta.get("cmd"):
+                    ET.SubElement(metadata, "cmd").text = doc.meta["cmd"]
+                if doc.meta.get("env"):
+                    env_elem = ET.SubElement(metadata, "env")
+                    for key, value in doc.meta["env"].items():
+                        var = ET.SubElement(env_elem, "variable")
+                        var.set("name", key)
+                        var.text = value
+        
+        # Pretty print XML
+        xml_str = minidom.parseString(ET.tostring(root)).toprettyxml(indent="  ")
+
+        # Cut first line (xml version)
+        xml_str = '\n'.join(xml_str.split('\n')[1:])
+        
+        # Write to file
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write(xml_str)
+        
+        self.logger.info(f"Wrote XML output to {output_path}")

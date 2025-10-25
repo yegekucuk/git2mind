@@ -10,7 +10,7 @@ import argparse
 
 from src.chunker import SimpleChunker
 from src.readers import RepoReader
-from src.writers import JsonWriter, MarkdownWriter
+from src.writers import JsonWriter, MarkdownWriter, XMLWriter
 
 
 def main():
@@ -31,10 +31,10 @@ Examples:
     )
     
     parser.add_argument('path', help='Path to repository')
-    parser.add_argument('-f', '--format', choices=['md', 'json'], default='md',
+    parser.add_argument('-f', '--format', choices=['md', 'json', 'xml'], default='md',
                        help='Output format (default: md)')
     parser.add_argument('-o', '--output', 
-                       help='Output file path (default: ./git2mind_output.[md|json])')
+                       help='Output file path (default: ./git2mind_output.[md|json|xml])')
     parser.add_argument('--exclude', action='append', default=[],
                        help='Exclude path pattern (can be repeated)')
     parser.add_argument('--chunk-size', type=int, default=50,
@@ -62,7 +62,7 @@ Examples:
     # Set default output path
     project_name = repo_path.absolute().name
     if not args.output:
-        ext = 'json' if args.format == 'json' else 'md'
+        ext = args.format
         args.output = f"./{project_name}_summary.{ext}"
     
     logger.info(f"Processing repository: {repo_path}")
@@ -89,10 +89,13 @@ Examples:
     
     # Write output
     if not args.dry_run:
-        if args.format == 'json':
-            writer = JsonWriter(logger)
-        else:
-            writer = MarkdownWriter(logger)
+        match args.format:
+            case "xml":
+                writer = XMLWriter(logger)
+            case "json":
+                writer = JsonWriter(logger)
+            case _:
+                writer = MarkdownWriter(logger)
         
         writer.write(str(repo_path), documents, args.output)
         logger.info(f"✓ Output written to: {args.output}")
