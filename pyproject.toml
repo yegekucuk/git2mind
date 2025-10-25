@@ -26,7 +26,9 @@ classifiers = [
     "Topic :: Software Development :: Version Control :: Git",
 ]
 
-dependencies = []
+dependencies = [
+    "pathspec>=0.11.0"
+]
 
 [project.optional-dependencies]
 full = [

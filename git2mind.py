@@ -45,7 +45,8 @@ Examples:
                        help='Do everything except writing output')
     parser.add_argument('-v', '--verbose', action='store_true',
                        help='Verbose logging')
-    
+    parser.add_argument('-g', '--gitignore', action='store_true',
+                       help='Use .gitignore to exclude files')
     args = parser.parse_args()
     
     # Set logging level
@@ -68,7 +69,7 @@ Examples:
     logger.info(f"Output format: {args.format}")
     
     # Read files
-    reader = RepoReader(path=str(repo_path), logger=logger, exclude_patterns=args.exclude)
+    reader = RepoReader(path=str(repo_path), logger=logger, exclude_patterns=args.exclude, use_gitignore=args.gitignore)
     documents = reader.read_files(max_files=args.max_files)
     
     if not documents:

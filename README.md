@@ -35,8 +35,8 @@ g2m .
 # Generate JSON summary of current directory
 g2m . -f json
 
-# Specify the name of output file
-g2m /path/to/repo -o summary.md
+# Specify the name of output file & use gitignore to exclude files
+g2m /path/to/repo -o summary.md -g
 
 # Exclude specific patterns
 g2m ./my-repo --exclude "tests" --exclude "*.log" --format md --output summary.md
@@ -59,6 +59,7 @@ Options:
   --dry-run                 Do everything except writing output
   -v, --verbose             Verbose logging
   -h, --help                Show help message
+  -g, --gitignore           Use .gitignore to exclude files
 ```
 
 ## 📄 Output Examples
@@ -135,6 +136,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ### Current: MVP (v0.1.0)
 - ✅ Basic CLI with essential flags
 - ✅ Local repository reading
+- ✅ Gitignore file support
 - ✅ Python, Markdown, Dockerfile and License parsers
 - ✅ Simple line-based chunking
 - ✅ Markdown and JSON output formats
