@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
 git2mind - Turn repositories into AI-friendly summaries
-MVP Version
 Author: @yegekucuk
 """
 import logging

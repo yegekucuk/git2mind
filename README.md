@@ -133,7 +133,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 🗺️ Roadmap
 
-### Current: MVP (v0.1.0)
+### Current:
 - ✅ Basic CLI with essential flags
 - ✅ Local repository reading
 - ✅ Gitignore file support
