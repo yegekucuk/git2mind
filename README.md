@@ -163,11 +163,6 @@ The following patterns are excluded by default:
 - **AI Context Preparation** - Prepare repositories for LLM analysis
 - **Project Auditing** - Quick overview of project structure and content
 
-## 🙏 Acknowledgments
-
-- Inspired by the need to make repositories more accessible to AI models
-- Built with Python standard library for maximum compatibility
-
 ## 📝 License
 
 - Author: Yunus Ege Küçük

@@ -2,7 +2,10 @@ import hashlib
 import re
 from pathlib import Path
 from datetime import datetime
+from markdown_it import MarkdownIt
+
 from src.data_models import Document
+
 
 class BaseParser:
     """Base parser interface"""
@@ -23,7 +26,7 @@ class BaseParser:
         )
     
     def get_language(self, path: Path) -> str:
-        return "text"
+        return "unknown"
 
 class PythonParser(BaseParser):
     def get_language(self, path: Path) -> str:
@@ -46,11 +49,18 @@ class PythonParser(BaseParser):
 class MarkdownParser(BaseParser):
     def get_language(self, path: Path) -> str:
         return "markdown"
-    
+
     def parse(self, path: Path, content: str) -> Document:
         doc = super().parse(path, content)
-        # Extract headers
-        headers = re.findall(r'^#{1,6}\s+(.+)$', content, re.MULTILINE)
+        md = MarkdownIt()
+        tokens = md.parse(content)
+        headers = []
+        for i, token in enumerate(tokens):
+            if token.type == "heading_open":
+                # heading_open -> heading_close arasındaki inline token text'ini al
+                next_token = tokens[i + 1]
+                if next_token.type == "inline":
+                    headers.append(next_token.content)
         doc.meta["headers"] = headers
         doc.meta["content"] = content
         return doc
