@@ -1,13 +1,13 @@
 # git2mind
 
-**Turn Python repositories into AI-friendly format (.md / .json)**
+**Turn Python repositories into AI-friendly format (.md / .json/ .xml)**
 
-git2mind scans a git repository, extracts and chunks files intelligently, and produces concise Markdown or JSON summaries that are ready for LLM consumption — perfect for onboarding and documentation generation.
+git2mind scans a git repository, extracts and chunks files intelligently, and produces concise Markdown, JSON or XML summaries that are ready for LLM consumption — perfect for onboarding and documentation generation.
 
 ## 🚀 Features
 
 - **Local repository scanning** - Process any local git repository or directory
-- **Multiple output formats** - Generate Markdown or JSON summaries
+- **Multiple output formats** - Generate Markdown, JSON or XML summaries
 - **Smart file filtering** - Automatically excludes binary files, build artifacts, and common ignore patterns
 - **Language-aware parsing** - Special handling different file types like Python, Markdown and Dockerfile
 - **Chunking support** - Split large files into manageable chunks for processing
@@ -32,8 +32,8 @@ pip install -e git2mind
 # Generate summary of current directory (markdown by default)
 g2m .
 
-# Generate JSON summary of current directory
-g2m . -f json
+# Generate XML summary of current directory
+g2m . -f xml
 
 # Specify the name of output file & use gitignore to exclude files
 g2m /path/to/repo -o summary.md -g
@@ -51,15 +51,15 @@ g2m . --verbose --chunk-size 100 --format json
 Usage: g2m PATH [OPTIONS]
 
 Options:
-  -f, --format [md|json]    Output format (default: md)
-  -o, --output PATH         Output file path (default: ./git2mind_output.[md|json])
-  --exclude PATTERN         Exclude path pattern (can be repeated)
-  --chunk-size INT          Lines per chunk (default: 50)
-  --max-files INT           Max files to process (default: 1000)
-  --dry-run                 Do everything except writing output
-  -v, --verbose             Verbose logging
-  -h, --help                Show help message
-  -g, --gitignore           Use .gitignore to exclude files
+  -f, --format [md|json|xml]    Output format (default: md)
+  -o, --output PATH             Output file path (default: ./git2mind_output.[md|json|xml])
+  --exclude PATTERN             Exclude path pattern (can be repeated)
+  --chunk-size INT              Lines per chunk (default: 50)
+  --max-files INT               Max files to process (default: 1000)
+  --dry-run                     Do everything except writing output
+  -v, --verbose                 Verbose logging
+  -h, --help                    Show help message
+  -g, --gitignore               Use .gitignore to exclude files
 ```
 
 ## 📄 Output Examples
@@ -113,6 +113,31 @@ Options:
 }
 ```
 
+### XML Output
+
+```xml
+<repository>
+  <info>
+    <name>git2mind</name>
+    <path>/home/yegekucuk/Documents/dev/yegekucuk/other/git2mind</path>
+    <generated_at>2025-10-27T13:40:23.986936</generated_at>
+    <files_processed>14</files_processed>
+  </info>
+  <files>
+    <file>
+      <path>git2mind.py</path>
+      <language>python</language>
+      <size_bytes>3682</size_bytes>
+      <lines>108</lines>
+      <metadata>
+        <functions>
+          <function>main</function>
+        </functions>
+      </metadata>
+    </file>
+  </files>
+```
+
 ## 🛠️ Development
 
 ### Project Structure
@@ -139,7 +164,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - ✅ Gitignore file support
 - ✅ Python, Markdown, Dockerfile and License parsers
 - ✅ Simple line-based chunking
-- ✅ Markdown and JSON output formats
+- ✅ Markdown, JSON and XML output formats
 - ✅ [PyPI package](https://pypi.org/project/git2mind/)
 
 ### Future:
