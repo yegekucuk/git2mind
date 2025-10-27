@@ -4,15 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "git2mind"
-version = "0.2.0"
-description = "Turn repositories into AI-friendly summaries (.md / .json)"
+version = "0.2.1"
+description = "Turn repositories into AI-friendly summaries"
 readme = "README.md"
 license = "MIT"
 authors = [
     {name = "yegekucuk", email = "yegekucuk@gmail.com"}
 ]
 requires-python = ">=3.8"
-keywords = ["git", "repository", "summarization", "ai", "llm", "markdown", "json"]
+keywords = ["git", "repository", "summarization", "ai", "llm", "markdown", "json", "xml"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
