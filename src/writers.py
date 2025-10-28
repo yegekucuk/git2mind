@@ -9,6 +9,38 @@ from xml.dom import minidom
 from src.data_models import Document
 
 
+def build_folder_structure(documents: List[Document]) -> dict:
+    """Build a tree structure from document paths"""
+    tree = {}
+    for doc in documents:
+        parts = Path(doc.path).parts
+        current = tree
+        for part in parts[:-1]:  # Exclude filename
+            if part not in current:
+                current[part] = {}
+            current = current[part]
+        # Add file to final directory
+        if parts:
+            current[parts[-1]] = None
+    return tree
+
+def log_tree(logger:Logger, tree):
+    logger.debug(f"Project structure: {tree}")
+
+def format_tree_md(tree: dict, prefix: str = "", is_last: bool = True) -> List[str]:
+    """Format tree structure for markdown"""
+    lines = []
+    items = list(tree.items())
+    for i, (name, subtree) in enumerate(items):
+        is_last_item = i == len(items) - 1
+        connector = "└── " if is_last_item else "├── "
+        lines.append(f"{prefix}{connector}{name}")
+        if subtree is not None:  # Directory
+            extension = "    " if is_last_item else "│   "
+            lines.extend(format_tree_md(subtree, prefix + extension, is_last_item))
+    return lines
+
+
 class MarkdownWriter:
     """Writes output in Markdown format"""
     def __init__(self, logger:Logger):
@@ -20,6 +52,15 @@ class MarkdownWriter:
         content.append(f"# Repo Summary: {Path(repo_path).absolute().name}\n")
         content.append(f"**Generated:** {datetime.now().isoformat()}  ")
         content.append(f"**Files processed:** {len(documents)}\n")
+        
+        # Add folder structure
+        content.append("## Folder Structure\n")
+        content.append("```")
+        tree = build_folder_structure(documents)
+        log_tree(self.logger, tree)
+        content.extend(format_tree_md(tree))
+        content.append("```\n")
+        
         content.append("## Files\n")
         
         for doc in documents:
@@ -60,6 +101,24 @@ class MarkdownWriter:
         
         self.logger.info(f"Wrote markdown output to {output_path}")
 
+
+def tree_to_list(tree: dict, path: str = "") -> List[dict]:
+    """Convert tree to list of paths with types"""
+    result = []
+    for name, subtree in tree.items():
+        current_path = f"{path}/{name}" if path else name
+        if subtree is None:
+            result.append({"path": current_path, "type": "file"})
+        else:
+            dir_entry = {
+                "path": current_path, 
+                "type": "directory",
+                "files": tree_to_list(subtree, current_path)
+            }
+            result.append(dir_entry)
+    return result
+
+
 class JsonWriter:
     def __init__(self, logger:Logger):
         self.logger = logger
@@ -67,6 +126,10 @@ class JsonWriter:
     
     def write(self, repo_path: str, documents: List[Document], output_path: str):
         """Generate JSON output"""
+        tree = build_folder_structure(documents)
+        log_tree(self.logger, tree)
+        structure = tree_to_list(tree)
+        
         output = {
             "repo": {
                 "name": Path(repo_path).absolute().name,
@@ -74,6 +137,7 @@ class JsonWriter:
                 "generated_at": datetime.now().isoformat(),
                 "files_processed": len(documents)
             },
+            "structure": structure,
             "files": []
         }
         
@@ -108,6 +172,20 @@ class JsonWriter:
         
         self.logger.info(f"Wrote JSON output to {output_path}")
 
+
+def tree_to_xml(parent: ET.Element, tree: dict, path: str = ""):
+    """Convert tree to XML elements"""
+    for name, subtree in tree.items():
+        current_path = f"{path}/{name}" if path else name
+        if subtree is None:
+            item = ET.SubElement(parent, "file")
+            item.set("path", current_path)
+        else:
+            item = ET.SubElement(parent, "directory")
+            item.set("path", current_path)
+            tree_to_xml(item, subtree, current_path)
+
+
 class XMLWriter:
     """Writes output in XML format"""
     def __init__(self, logger: Logger):
@@ -123,6 +201,12 @@ class XMLWriter:
         ET.SubElement(repo_info, "path").text = str(Path(repo_path).absolute())
         ET.SubElement(repo_info, "generated_at").text = datetime.now().isoformat()
         ET.SubElement(repo_info, "files_processed").text = str(len(documents))
+        
+        # Add folder structure
+        structure = ET.SubElement(root, "structure")
+        tree = build_folder_structure(documents)
+        log_tree(self.logger, tree)
+        tree_to_xml(structure, tree)
         
         # Add files
         files_elem = ET.SubElement(root, "files")
