@@ -43,16 +43,9 @@ htmlcov/
 .hypothesis/
 
 # Output files from git2mind
-git2mvp_output.md
-git2mvp_output.json
-git2mind_output.md
-git2mind_output.json
 *_summary.md
 *_summary.json
-summary.md
-summary.json
-output.md
-output.json
+*_summary.xml
 
 # Logs
 *.log
