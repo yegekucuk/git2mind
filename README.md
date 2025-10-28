@@ -2,16 +2,19 @@
 
 **Turn Python repositories into AI-friendly format (.md / .json/ .xml)**
 
-git2mind scans a git repository, extracts and chunks files intelligently, and produces concise Markdown, JSON or XML summaries that are ready for LLM consumption — perfect for onboarding and documentation generation.
+git2mind scans a git repository, extracts and chunks files intelligently, and produces concise Markdown, JSON or XML summaries that are ready for LLM consumption. Perfect for onboarding and documentation generation.
 
 ## 🚀 Features
 
-- **Local repository scanning** - Process any local git repository or directory
-- **Multiple output formats** - Generate Markdown, JSON or XML summaries
-- **Smart file filtering** - Automatically excludes binary files, build artifacts, and common ignore patterns
-- **Language-aware parsing** - Special handling different file types like Python, Markdown and Dockerfile
-- **Chunking support** - Split large files into manageable chunks for processing
-- **Customizable exclusions** - Add custom patterns to exclude specific files or directories
+- ✅ Basic CLI with essential flags
+- ✅ Local repository scanning
+- ✅ Create project structure tree
+- ✅ Gitignore file support & custom exclusions
+- ✅ Exclude binary files and common ignore patterns
+- ✅ Python, Markdown, Dockerfile and License parsers
+- ✅ Simple line-based chunking
+- ✅ Multiple output formats
+- ✅ [PyPI package](https://pypi.org/project/git2mind/)
 
 ## 📦 Installation
 
@@ -79,21 +82,6 @@ git2mind/
 ### Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 🗺️ Roadmap
-
-### Current:
-- ✅ Basic CLI with essential flags
-- ✅ Local repository reading
-- ✅ Gitignore file support
-- ✅ Python, Markdown, Dockerfile and License parsers
-- ✅ Simple line-based chunking
-- ✅ Markdown, JSON and XML output formats
-- ✅ [PyPI package](https://pypi.org/project/git2mind/)
-
-### Future:
-- [ ] Configuration file support
-- [ ] ML/NLP supported solutions for summarizing
 
 ## 📋 Default Exclusions
 
