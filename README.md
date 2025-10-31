@@ -2,12 +2,13 @@
 
 **Turn Python repositories into AI-friendly format (.md / .json/ .xml)**
 
-git2mind scans a git repository, extracts and chunks files intelligently, and produces concise Markdown, JSON or XML summaries that are ready for LLM consumption. Perfect for onboarding and documentation generation.
+git2mind scans a git repository, analyzes commits, branches, and contributors, extracts and chunks files intelligently, and produces concise Markdown, JSON or XML summaries that are ready for LLM consumption. Perfect for onboarding and documentation generation.
 
 ## 🚀 Features
 
 - ✅ Basic CLI with essential flags
 - ✅ Local repository scanning
+- ✅ Analyze commits, branches and contributors
 - ✅ Create project structure tree
 - ✅ Gitignore file support & custom exclusions
 - ✅ Exclude binary files and common ignore patterns
@@ -57,31 +58,14 @@ Options:
   -f, --format [md|json|xml]    Output format (default: md)
   -o, --output PATH             Output file path (default: ./git2mind_output.[md|json|xml])
   --exclude PATTERN             Exclude path pattern (can be repeated)
+  -g, --gitignore               Use .gitignore to exclude files
+  --git-commits INT             Number of recent commits to include (default: 20)
   --chunk-size INT              Lines per chunk (default: 50)
   --max-files INT               Max files to process (default: 1000)
   --dry-run                     Do everything except writing output
   -v, --verbose                 Verbose logging
   -h, --help                    Show help message
-  -g, --gitignore               Use .gitignore to exclude files
 ```
-
-## 🛠️ Development
-
-### Project Structure
-
-```
-git2mind/
-├── src/                 # Python source files
-├── .gitignore           # Gitignore
-├── git2mind.py          # Main file of the project
-├── LICENSE              # The MIT License
-├── pyproject.toml       # Package configuration
-└── README.md            # This file
-```
-
-### Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📋 Default Exclusions
 

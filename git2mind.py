@@ -10,6 +10,7 @@ import argparse
 from src.chunker import SimpleChunker
 from src.readers import RepoReader
 from src.writers import JsonWriter, MarkdownWriter, XMLWriter
+from src.git_analyzer import GitAnalyzer
 
 
 def main():
@@ -26,6 +27,7 @@ Examples:
   g2m ./my-repo -f md -o repo_summary.md
   g2m . --exclude 'tests' --format json
   g2m /path/to/repo --verbose --chunk-size 100
+  g2m . --git-history --format json
         """
     )
     
@@ -36,6 +38,10 @@ Examples:
                        help='Output file path (default: ./git2mind_output.[md|json|xml])')
     parser.add_argument('--exclude', action='append', default=[],
                        help='Exclude path pattern (can be repeated)')
+    parser.add_argument('-g', '--gitignore', action='store_true',
+                       help='Use .gitignore to exclude files')
+    parser.add_argument('--git-commits', type=int, default=20,
+                       help='Number of recent commits to include (default: 20)')
     parser.add_argument('--chunk-size', type=int, default=50,
                        help='Lines per chunk (default: 50)')
     parser.add_argument('--max-files', type=int, default=1000,
@@ -44,8 +50,6 @@ Examples:
                        help='Do everything except writing output')
     parser.add_argument('-v', '--verbose', action='store_true',
                        help='Verbose logging')
-    parser.add_argument('-g', '--gitignore', action='store_true',
-                       help='Use .gitignore to exclude files')
     args = parser.parse_args()
     
     # Set logging level
@@ -66,6 +70,14 @@ Examples:
     
     logger.info(f"Processing repository: {repo_path}")
     logger.info(f"Output format: {args.format}")
+    
+    # Initialize git analyzer
+    git_analyzer = GitAnalyzer(str(repo_path), logger)
+    if not git_analyzer.is_git_repo:
+            logger.warning("Not a git repository - skipping git history")
+            git_analyzer = None
+    else:
+        logger.info("Git repository detected")
     
     # Read files
     reader = RepoReader(path=str(repo_path), logger=logger, exclude_patterns=args.exclude, use_gitignore=args.gitignore)
@@ -96,7 +108,7 @@ Examples:
             case _:
                 writer = MarkdownWriter(logger)
         
-        writer.write(str(repo_path), documents, args.output)
+        writer.write(str(repo_path), documents, args.output, git_analyzer)
         logger.info(f"✓ Output written to: {args.output}")
     else:
         logger.info("Dry run - no output written")

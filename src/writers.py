@@ -2,11 +2,12 @@ from datetime import datetime
 import json
 from logging import Logger
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
 
 from src.data_models import Document
+from src.git_analyzer import GitAnalyzer
 
 
 def build_folder_structure(documents: List[Document]) -> dict:
@@ -46,12 +47,57 @@ class MarkdownWriter:
     def __init__(self, logger:Logger):
         self.logger = logger
     
-    def write(self, repo_path: str, documents: List[Document], output_path: str):
+    def write(self, repo_path: str, documents: List[Document], output_path: str, 
+              git_analyzer: Optional[GitAnalyzer] = None):
         """Generate markdown output"""
         content = []
         content.append(f"# Repo Summary: {Path(repo_path).absolute().name}\n")
         content.append(f"**Generated:** {datetime.now().isoformat()}  ")
         content.append(f"**Files processed:** {len(documents)}\n")
+        
+        # Add Git History Section
+        if git_analyzer and git_analyzer.is_git_repo:
+            content.append("## Git History\n")
+            
+            # Summary
+            summary = git_analyzer.get_summary()
+            content.append(f"**Current Branch:** {summary.get('current_branch', 'N/A')}  ")
+            content.append(f"**Total Commits:** {summary.get('total_commits', 0)}  ")
+            content.append(f"**Contributors:** {summary.get('total_contributors', 0)}  ")
+            if summary.get('first_commit_date'):
+                content.append(f"**First Commit:** {summary['first_commit_date']}  ")
+            if summary.get('last_commit_date'):
+                content.append(f"**Last Commit:** {summary['last_commit_date']}  ")
+            content.append("")
+            
+            # Branches
+            branches = git_analyzer.get_branches()
+            if branches:
+                content.append("### Branches\n")
+                for branch in branches[:10]:  # Limit to 10
+                    marker = "* " if branch.is_current else "- "
+                    content.append(f"{marker}**{branch.name}** (Last: {branch.last_commit}, {branch.last_commit_date.strftime('%Y-%m-%d')})")
+                content.append("")
+            
+            # Recent Commits
+            commits = git_analyzer.get_commits(limit=20)
+            if commits:
+                content.append("### Recent Commits\n")
+                for commit in commits:
+                    content.append(f"- **{commit.hash}** - {commit.message}")
+                    content.append(f"  *{commit.author}* on {commit.date.strftime('%Y-%m-%d %H:%M')}")
+                    if commit.files_changed > 0:
+                        content.append(f"  {commit.files_changed} files: +{commit.insertions}/-{commit.deletions}")
+                content.append("")
+            
+            # Contributors
+            contributors = git_analyzer.get_contributors()
+            if contributors:
+                content.append("### Contributors\n")
+                for contrib in contributors[:10]:  # Top 10
+                    content.append(f"- **{contrib.name}** ({contrib.email})")
+                    content.append(f"  {contrib.commits} commits, +{contrib.insertions}/-{contrib.deletions}")
+                content.append("")
         
         # Add folder structure
         content.append("## Folder Structure\n")
@@ -124,7 +170,8 @@ class JsonWriter:
         self.logger = logger
     """Writes output in JSON format"""
     
-    def write(self, repo_path: str, documents: List[Document], output_path: str):
+    def write(self, repo_path: str, documents: List[Document], output_path: str,
+              git_analyzer: Optional[GitAnalyzer] = None):
         """Generate JSON output"""
         tree = build_folder_structure(documents)
         log_tree(self.logger, tree)
@@ -140,6 +187,52 @@ class JsonWriter:
             "structure": structure,
             "files": []
         }
+        
+        # Add Git History
+        if git_analyzer and git_analyzer.is_git_repo:
+            git_data = {
+                "summary": git_analyzer.get_summary(),
+                "branches": [],
+                "recent_commits": [],
+                "contributors": []
+            }
+            
+            # Branches
+            branches = git_analyzer.get_branches()
+            for branch in branches[:10]:
+                git_data["branches"].append({
+                    "name": branch.name,
+                    "is_current": branch.is_current,
+                    "last_commit": branch.last_commit,
+                    "last_commit_date": branch.last_commit_date.isoformat()
+                })
+            
+            # Commits
+            commits = git_analyzer.get_commits(limit=20)
+            for commit in commits:
+                git_data["recent_commits"].append({
+                    "hash": commit.hash,
+                    "author": commit.author,
+                    "email": commit.email,
+                    "date": commit.date.isoformat(),
+                    "message": commit.message,
+                    "files_changed": commit.files_changed,
+                    "insertions": commit.insertions,
+                    "deletions": commit.deletions
+                })
+            
+            # Contributors
+            contributors = git_analyzer.get_contributors()
+            for contrib in contributors[:10]:
+                git_data["contributors"].append({
+                    "name": contrib.name,
+                    "email": contrib.email,
+                    "commits": contrib.commits,
+                    "insertions": contrib.insertions,
+                    "deletions": contrib.deletions
+                })
+            
+            output["git_history"] = git_data
         
         for doc in documents:
             file_info = {
@@ -191,7 +284,8 @@ class XMLWriter:
     def __init__(self, logger: Logger):
         self.logger = logger
     
-    def write(self, repo_path: str, documents: List[Document], output_path: str):
+    def write(self, repo_path: str, documents: List[Document], output_path: str,
+              git_analyzer: Optional[GitAnalyzer] = None):
         """Generate XML output"""
         root = ET.Element("repository")
         
@@ -201,6 +295,59 @@ class XMLWriter:
         ET.SubElement(repo_info, "path").text = str(Path(repo_path).absolute())
         ET.SubElement(repo_info, "generated_at").text = datetime.now().isoformat()
         ET.SubElement(repo_info, "files_processed").text = str(len(documents))
+        
+        # Add Git History
+        if git_analyzer and git_analyzer.is_git_repo:
+            git_elem = ET.SubElement(root, "git_history")
+            
+            # Summary
+            summary = git_analyzer.get_summary()
+            summary_elem = ET.SubElement(git_elem, "summary")
+            ET.SubElement(summary_elem, "current_branch").text = summary.get('current_branch', 'N/A')
+            ET.SubElement(summary_elem, "total_commits").text = str(summary.get('total_commits', 0))
+            ET.SubElement(summary_elem, "total_contributors").text = str(summary.get('total_contributors', 0))
+            if summary.get('first_commit_date'):
+                ET.SubElement(summary_elem, "first_commit_date").text = summary['first_commit_date']
+            if summary.get('last_commit_date'):
+                ET.SubElement(summary_elem, "last_commit_date").text = summary['last_commit_date']
+            
+            # Branches
+            branches = git_analyzer.get_branches()
+            if branches:
+                branches_elem = ET.SubElement(git_elem, "branches")
+                for branch in branches[:10]:
+                    branch_elem = ET.SubElement(branches_elem, "branch")
+                    branch_elem.set("current", str(branch.is_current).lower())
+                    ET.SubElement(branch_elem, "name").text = branch.name
+                    ET.SubElement(branch_elem, "last_commit").text = branch.last_commit
+                    ET.SubElement(branch_elem, "last_commit_date").text = branch.last_commit_date.isoformat()
+            
+            # Commits
+            commits = git_analyzer.get_commits(limit=20)
+            if commits:
+                commits_elem = ET.SubElement(git_elem, "recent_commits")
+                for commit in commits:
+                    commit_elem = ET.SubElement(commits_elem, "commit")
+                    ET.SubElement(commit_elem, "hash").text = commit.hash
+                    ET.SubElement(commit_elem, "author").text = commit.author
+                    ET.SubElement(commit_elem, "email").text = commit.email
+                    ET.SubElement(commit_elem, "date").text = commit.date.isoformat()
+                    ET.SubElement(commit_elem, "message").text = commit.message
+                    ET.SubElement(commit_elem, "files_changed").text = str(commit.files_changed)
+                    ET.SubElement(commit_elem, "insertions").text = str(commit.insertions)
+                    ET.SubElement(commit_elem, "deletions").text = str(commit.deletions)
+            
+            # Contributors
+            contributors = git_analyzer.get_contributors()
+            if contributors:
+                contributors_elem = ET.SubElement(git_elem, "contributors")
+                for contrib in contributors[:10]:
+                    contrib_elem = ET.SubElement(contributors_elem, "contributor")
+                    ET.SubElement(contrib_elem, "name").text = contrib.name
+                    ET.SubElement(contrib_elem, "email").text = contrib.email
+                    ET.SubElement(contrib_elem, "commits").text = str(contrib.commits)
+                    ET.SubElement(contrib_elem, "insertions").text = str(contrib.insertions)
+                    ET.SubElement(contrib_elem, "deletions").text = str(contrib.deletions)
         
         # Add folder structure
         structure = ET.SubElement(root, "structure")
