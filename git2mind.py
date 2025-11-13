@@ -40,6 +40,8 @@ Examples:
                        help='Exclude path pattern (can be repeated)')
     parser.add_argument('-g', '--gitignore', action='store_true',
                        help='Use .gitignore to exclude files')
+    parser.add_argument('--git-history', action='store_true',
+                       help='Include git history (commits, contributors). Disabled by default')
     parser.add_argument('--git-commits', type=int, default=20,
                        help='Number of recent commits to include (default: 20)')
     parser.add_argument('--chunk-size', type=int, default=50,
@@ -71,13 +73,17 @@ Examples:
     logger.info(f"Processing repository: {repo_path}")
     logger.info(f"Output format: {args.format}")
     
-    # Initialize git analyzer
-    git_analyzer = GitAnalyzer(str(repo_path), logger)
-    if not git_analyzer.is_git_repo:
+    # Initialize git analyzer only if user requested git history
+    git_analyzer = None
+    if args.git_history:
+        git_analyzer = GitAnalyzer(str(repo_path), logger)
+        if not git_analyzer.is_git_repo:
             logger.warning("Not a git repository - skipping git history")
             git_analyzer = None
+        else:
+            logger.info("Git repository detected and git history will be included")
     else:
-        logger.info("Git repository detected")
+        logger.info("Git history not requested; skipping git analysis")
     
     # Read files
     reader = RepoReader(path=str(repo_path), logger=logger, exclude_patterns=args.exclude, use_gitignore=args.gitignore)

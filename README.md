@@ -39,6 +39,9 @@ pip install -e git2mind
 # Generate summary of current directory (markdown by default)
 g2m .
 
+# Include git history
+g2m . --git-history
+
 # Generate XML summary of current directory
 g2m . -f xml
 
@@ -62,6 +65,7 @@ Options:
   -o, --output PATH             Output file path (default: ./git2mind_output.[md|json|xml])
   --exclude PATTERN             Exclude path pattern (can be repeated)
   -g, --gitignore               Use .gitignore to exclude files
+  --git-history                 Include git history (commits, contributors). Disabled by default
   --git-commits INT             Number of recent commits to include (default: 20)
   --chunk-size INT              Lines per chunk (default: 50)
   --max-files INT               Max files to process (default: 1000)
