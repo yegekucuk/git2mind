@@ -48,7 +48,7 @@ class MarkdownWriter:
         self.logger = logger
     
     def write(self, repo_path: str, documents: List[Document], output_path: str, 
-              git_analyzer: Optional[GitAnalyzer] = None):
+              git_analyzer: Optional[GitAnalyzer] = None, commits_limit: int = 20):
         """Generate markdown output"""
         content = []
         content.append(f"# Repo Summary: {Path(repo_path).absolute().name}\n")
@@ -80,7 +80,7 @@ class MarkdownWriter:
                 content.append("")
             
             # Recent Commits
-            commits = git_analyzer.get_commits(limit=20)
+            commits = git_analyzer.get_commits(limit=commits_limit)
             if commits:
                 content.append("### Recent Commits\n")
                 for commit in commits:
@@ -171,7 +171,7 @@ class JsonWriter:
     """Writes output in JSON format"""
     
     def write(self, repo_path: str, documents: List[Document], output_path: str,
-              git_analyzer: Optional[GitAnalyzer] = None):
+              git_analyzer: Optional[GitAnalyzer] = None, commits_limit: int = 20):
         """Generate JSON output"""
         tree = build_folder_structure(documents)
         log_tree(self.logger, tree)
@@ -208,7 +208,7 @@ class JsonWriter:
                 })
             
             # Commits
-            commits = git_analyzer.get_commits(limit=20)
+            commits = git_analyzer.get_commits(limit=commits_limit)
             for commit in commits:
                 git_data["recent_commits"].append({
                     "hash": commit.hash,
@@ -285,7 +285,7 @@ class XMLWriter:
         self.logger = logger
     
     def write(self, repo_path: str, documents: List[Document], output_path: str,
-              git_analyzer: Optional[GitAnalyzer] = None):
+              git_analyzer: Optional[GitAnalyzer] = None, commits_limit: int = 20):
         """Generate XML output"""
         root = ET.Element("repository")
         
@@ -323,7 +323,7 @@ class XMLWriter:
                     ET.SubElement(branch_elem, "last_commit_date").text = branch.last_commit_date.isoformat()
             
             # Commits
-            commits = git_analyzer.get_commits(limit=20)
+            commits = git_analyzer.get_commits(limit=commits_limit)
             if commits:
                 commits_elem = ET.SubElement(git_elem, "recent_commits")
                 for commit in commits:

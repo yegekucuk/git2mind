@@ -113,8 +113,7 @@ Examples:
                 writer = JsonWriter(logger)
             case _:
                 writer = MarkdownWriter(logger)
-        
-        writer.write(str(repo_path), documents, args.output, git_analyzer)
+        writer.write(str(repo_path), documents, args.output, git_analyzer, args.git_commits)
         logger.info(f"✓ Output written to: {args.output}")
     else:
         logger.info("Dry run - no output written")
