@@ -11,10 +11,9 @@ git2mind scans a git repository, analyzes commits, branches, and contributors, e
 
 - ✅ Basic CLI with essential flags
 - ✅ Local repository scanning
-- ✅ Analyze commits, branches and contributors
 - ✅ Create project structure tree
-- ✅ Gitignore file support & custom exclusions
-- ✅ Exclude binary files and common ignore patterns
+- ✅ Analyze commits, branches and contributors
+- ✅ Exclude binary files and common ignore patterns, default gitignore file support & custom exclusions
 - ✅ Python, Markdown, Dockerfile and License parsers
 - ✅ Simple line-based chunking
 - ✅ Multiple output formats
@@ -39,14 +38,18 @@ pip install -e git2mind
 # Generate summary of current directory (markdown by default)
 g2m .
 
-# Include git history
-g2m . --git-history
 
 # Generate XML summary of current directory
 g2m . -f xml
 
-# Specify the name of output file & use gitignore to exclude files
-g2m /path/to/repo -o summary.md -g
+# Include git history
+g2m . --git-history
+
+# Specify the name of output file (gitignore is used by default)
+g2m /path/to/repo -o summary.md
+
+# If you want to ignore .gitignore and include all files, disable it:
+g2m /path/to/repo -o summary.md --no-gitignore
 
 # Exclude specific patterns
 g2m ./my-repo --exclude "tests" --exclude "*.log" --format md --output summary.md
@@ -64,7 +67,7 @@ Options:
   -f, --format [md|json|xml]    Output format (default: md)
   -o, --output PATH             Output file path (default: ./git2mind_output.[md|json|xml])
   --exclude PATTERN             Exclude path pattern (can be repeated)
-  -g, --gitignore               Use .gitignore to exclude files
+  --no-gitignore                Do not use .gitignore to exclude files (gitignore is used by default)
   --git-history                 Include git history (commits, contributors). Disabled by default
   --git-commits INT             Number of recent commits to include (default: 20)
   --chunk-size INT              Lines per chunk (default: 50)

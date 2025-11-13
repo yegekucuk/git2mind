@@ -38,8 +38,8 @@ Examples:
                        help='Output file path (default: ./git2mind_output.[md|json|xml])')
     parser.add_argument('--exclude', action='append', default=[],
                        help='Exclude path pattern (can be repeated)')
-    parser.add_argument('-g', '--gitignore', action='store_true',
-                       help='Use .gitignore to exclude files')
+    parser.add_argument('--no-gitignore', action='store_false', dest='gitignore',
+                       help='Do not use .gitignore to exclude files (gitignore is used by default)')
     parser.add_argument('--git-history', action='store_true',
                        help='Include git history (commits, contributors). Disabled by default')
     parser.add_argument('--git-commits', type=int, default=20,
