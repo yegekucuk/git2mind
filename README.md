@@ -1,7 +1,7 @@
 # git2mind
 ![Python Version](https://img.shields.io/badge/python%20version-%3E%3D3.8-blue)
 [![PyPi Package](https://img.shields.io/badge/pypi%20package-live-green)](https://pypi.org/project/git2mind/)
-[![PyPI Downloads](https://img.shields.io/badge/downloads-1.6k-green)](https://pepy.tech/projects/git2mind)
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/git2mind?period=total&units=INTERNATIONAL_SYSTEM&left_color=GRAY&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/git2mind)
 
 **Turn Python repositories into AI-friendly format (.md / .json/ .xml)**
 
