@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-git2mind - Turn repositories into AI-friendly summaries
+tria - Turn repositories into AI-friendly summaries
 Author: @yegekucuk
 """
 import logging
@@ -19,15 +19,15 @@ def main():
     logger = logging.getLogger(__name__)
 
     parser = argparse.ArgumentParser(
-        description="g2m (git2mind) - Turn Python repositories into AI-friendly format.",
+        description="tria - Turn Python repositories into AI-friendly format.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  g2m .
-  g2m ./my-repo -f md -o repo_summary.md
-  g2m . --exclude 'tests' --format json
-  g2m /path/to/repo --verbose --chunk-size 100
-  g2m . --git-history --format json
+  tria .
+  tria ./my-repo -f md -o repo_summary.md
+  tria . --exclude 'tests' --format json
+  tria /path/to/repo --verbose --chunk-size 100
+  tria . --git-history --format json
         """
     )
     
@@ -35,7 +35,7 @@ Examples:
     parser.add_argument('-f', '--format', choices=['md', 'json', 'xml'], default='md',
                        help='Output format (default: md)')
     parser.add_argument('-o', '--output', 
-                       help='Output file path (default: ./git2mind_output.[md|json|xml])')
+                       help='Output file path (default: ./tria_output.[md|json|xml])')
     parser.add_argument('--exclude', action='append', default=[],
                        help='Exclude path pattern (can be repeated)')
     parser.add_argument('--no-gitignore', action='store_false', dest='gitignore',

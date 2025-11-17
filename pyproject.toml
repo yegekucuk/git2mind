@@ -3,8 +3,8 @@ requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "git2mind"
-version = "0.4.1"
+name = "tria"
+version = "0.4.2"
 description = "Turn repositories into AI-friendly summaries"
 readme = "README.md"
 license = "MIT"
@@ -39,16 +39,16 @@ full = [
 ]
 
 [project.scripts]
-g2m = "git2mind:main"
+tria = "tria:main"
 
 [project.urls]
-Homepage = "https://github.com/yegekucuk/git2mind"
-Documentation = "https://github.com/yegekucuk/git2mind#readme"
-Repository = "https://github.com/yegekucuk/git2mind"
-Issues = "https://github.com/yegekucuk/git2mind/issues"
+Homepage = "https://github.com/yegekucuk/tria"
+Documentation = "https://github.com/yegekucuk/tria#readme"
+Repository = "https://github.com/yegekucuk/tria"
+Issues = "https://github.com/yegekucuk/tria/issues"
 
 [tool.setuptools]
-py-modules = ["git2mind"]
+py-modules = ["tria"]
 packages = ["src"]
 
 [tool.ruff]
@@ -64,4 +64,4 @@ target-version = ["py38", "py39", "py310", "py311"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"
-addopts = "-v --cov=git2mind --cov-report=term-missing"
+addopts = "-v --cov=tria --cov-report=term-missing"
